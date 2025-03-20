@@ -85,15 +85,15 @@ struct sqlca_t *ECPGget_sqlca(void);
 void get_connection_details(char *db_name, char *username, char *password) {
     printf("Enter database name: ");
     fgets(db_name, 256, stdin);
-    db_name[strcspn(db_name, "\n")] = '\0'; // Удаление символа новой строки
+    db_name[strcspn(db_name, "\n")] = '\0';
 
     printf("Enter username: ");
     fgets(username, 256, stdin);
-    username[strcspn(username, "\n")] = '\0'; // Удаление символа новой строки
+    username[strcspn(username, "\n")] = '\0';
 
     printf("Enter password: ");
     fgets(password, 256, stdin);
-    password[strcspn(password, "\n")] = '\0'; // Удаление символа новой строки
+    password[strcspn(password, "\n")] = '\0';
 }
 
 void connect_to_db(const char *username, const char *password, const char *db_name) {
@@ -142,7 +142,6 @@ void add_book(const char *title, const char *release_date, const char *genre) {
 #line 41 "main.ec"
 
 
-    // Вызов хранимой процедуры add_book
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "call add_book ( $1  , $2  , $3  )", 
 	ECPGt_char,&(book_title),(long)0,(long)1,(1)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
@@ -150,18 +149,18 @@ void add_book(const char *title, const char *release_date, const char *genre) {
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,&(book_genre),(long)0,(long)1,(1)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 44 "main.ec"
+#line 43 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to add book: %s\n", sqlca.sqlerrm.sqlerrmc);
         { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 47 "main.ec"
+#line 46 "main.ec"
 
         return;
     }
     { ECPGtrans(__LINE__, NULL, "commit");}
-#line 50 "main.ec"
- // Фиксируем изменения
+#line 49 "main.ec"
+ 
     printf("Book added successfully!\n");
 }
 
@@ -173,41 +172,41 @@ void search_books_by_genre(const char *genre) {
      
         
     
-#line 56 "main.ec"
+#line 55 "main.ec"
  int id ;
  
-#line 57 "main.ec"
+#line 56 "main.ec"
  char title [ 256 ] ;
  
-#line 58 "main.ec"
+#line 57 "main.ec"
  char release_date [ 11 ] ;
  
-#line 59 "main.ec"
+#line 58 "main.ec"
  char book_genre [ 256 ] ;
  
-#line 60 "main.ec"
+#line 59 "main.ec"
  const char * search_genre = genre ;
 /* exec sql end declare section */
-#line 61 "main.ec"
+#line 60 "main.ec"
 
 
-    // Используем курсор для поиска книг по жанру
+
     ECPGset_var( 0, &( search_genre ), __LINE__);\
  /* declare genre_cur cursor for select id , title , release_date , genre from books where genre ilike '%' || $1  || '%' */
-#line 67 "main.ec"
+#line 66 "main.ec"
 
-#line 67 "main.ec"
+#line 66 "main.ec"
 
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "declare genre_cur cursor for select id , title , release_date , genre from books where genre ilike '%' || $1  || '%'", 
 	ECPGt_char,&(search_genre),(long)0,(long)1,(1)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 68 "main.ec"
+#line 67 "main.ec"
 
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to open cursor: %s\n", sqlca.sqlerrm.sqlerrmc);
         { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 72 "main.ec"
+#line 71 "main.ec"
 
         return;
     }
@@ -223,13 +222,13 @@ void search_books_by_genre(const char *genre) {
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(book_genre),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
-#line 78 "main.ec"
+#line 77 "main.ec"
 
-        if (sqlca.sqlcode == 100) break; // Код 100 означает "нет данных"
+        if (sqlca.sqlcode == 100) break; 
         if (sqlca.sqlcode != 0) {
             fprintf(stderr, "Failed to fetch data: %s\n", sqlca.sqlerrm.sqlerrmc);
             { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 82 "main.ec"
+#line 81 "main.ec"
 
             break;
         }
@@ -237,7 +236,7 @@ void search_books_by_genre(const char *genre) {
     }
 
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "close genre_cur", ECPGt_EOIT, ECPGt_EORT);}
-#line 88 "main.ec"
+#line 87 "main.ec"
 
 }
 
@@ -245,35 +244,35 @@ void show_all_books() {
     /* exec sql begin declare section */
      
      
-      // Формат даты: YYYY-MM-DD
+     
      
     
-#line 93 "main.ec"
+#line 92 "main.ec"
  int id ;
  
-#line 94 "main.ec"
+#line 93 "main.ec"
  char title [ 256 ] ;
  
-#line 95 "main.ec"
+#line 94 "main.ec"
  char release_date [ 11 ] ;
  
-#line 96 "main.ec"
+#line 95 "main.ec"
  char genre [ 256 ] ;
 /* exec sql end declare section */
-#line 97 "main.ec"
+#line 96 "main.ec"
 
 
-    // Используем курсор для выборки всех книг
+
     /* declare all_books_cur cursor for select * from books */
-#line 101 "main.ec"
+#line 100 "main.ec"
 
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "declare all_books_cur cursor for select * from books", ECPGt_EOIT, ECPGt_EORT);}
-#line 102 "main.ec"
+#line 101 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to open cursor: %s\n", sqlca.sqlerrm.sqlerrmc);
         { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 105 "main.ec"
+#line 104 "main.ec"
 
         return;
     }
@@ -289,20 +288,20 @@ void show_all_books() {
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(genre),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
-#line 111 "main.ec"
+#line 110 "main.ec"
 
-        if (sqlca.sqlcode == 100) break; // Код 100 означает "нет данных"
+        if (sqlca.sqlcode == 100) break; 
         if (sqlca.sqlcode != 0) {
             fprintf(stderr, "Failed to fetch data: %s\n", sqlca.sqlerrm.sqlerrmc);
             { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 115 "main.ec"
+#line 114 "main.ec"
 
             return;
         }
         printf("ID: %d, Title: %s, Release Date: %s, Genre: %s\n", id, title, release_date, genre);
     }
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "close all_books_cur", ECPGt_EOIT, ECPGt_EORT);}
-#line 120 "main.ec"
+#line 119 "main.ec"
 
 }
 
@@ -310,46 +309,46 @@ void delete_book(const char *title) {
     /* exec sql begin declare section */
         
     
-#line 125 "main.ec"
+#line 124 "main.ec"
  const char * book_title = title ;
 /* exec sql end declare section */
-#line 126 "main.ec"
+#line 125 "main.ec"
 
 
-    // Вызов хранимой процедуры delete_book_by_title
+
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "call delete_book_by_title ( $1  )", 
 	ECPGt_char,&(book_title),(long)0,(long)1,(1)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 129 "main.ec"
+#line 128 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to delete book: %s\n", sqlca.sqlerrm.sqlerrmc);
         { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 132 "main.ec"
+#line 131 "main.ec"
 
         return;
     }
     { ECPGtrans(__LINE__, NULL, "commit");}
-#line 135 "main.ec"
- // Фиксируем изменения
+#line 134 "main.ec"
+ 
     printf("Book(s) deleted successfully!\n");
 }
 
 void delete_all_books() {
-    // Вызов хранимой процедуры delete_all_books
+
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "call delete_all_books ( )", ECPGt_EOIT, ECPGt_EORT);}
-#line 141 "main.ec"
+#line 140 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to delete all books: %s\n", sqlca.sqlerrm.sqlerrmc);
         { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 144 "main.ec"
+#line 143 "main.ec"
 
         return;
     }
     { ECPGtrans(__LINE__, NULL, "commit");}
-#line 147 "main.ec"
- // Фиксируем изменения
+#line 146 "main.ec"
+
     printf("All books deleted successfully!\n");
 }
 
@@ -357,45 +356,41 @@ void update_book_by_id() {
     /* exec sql begin declare section */
      
      
-      // Формат даты: YYYY-MM-DD
+      
      
     
-#line 153 "main.ec"
+#line 152 "main.ec"
  int book_id ;
  
-#line 154 "main.ec"
+#line 153 "main.ec"
  char new_title [ 256 ] ;
  
-#line 155 "main.ec"
+#line 154 "main.ec"
  char new_release_date [ 11 ] ;
  
-#line 156 "main.ec"
+#line 155 "main.ec"
  char new_genre [ 256 ] ;
 /* exec sql end declare section */
-#line 157 "main.ec"
+#line 156 "main.ec"
 
 
-    // Запрос ID книги
     printf("Enter the ID of the book to update: ");
     scanf("%d", &book_id);
-    getchar(); // Очистка буфера после ввода числа
+    getchar(); 
 
-    // Запрос нового названия
     printf("Enter the new title: ");
     fgets(new_title, sizeof(new_title), stdin);
-    new_title[strcspn(new_title, "\n")] = '\0'; // Удаление символа новой строки
+    new_title[strcspn(new_title, "\n")] = '\0';
 
-    // Запрос новой даты выпуска
     printf("Enter the new release date (YYYY-MM-DD): ");
     fgets(new_release_date, sizeof(new_release_date), stdin);
-    new_release_date[strcspn(new_release_date, "\n")] = '\0'; // Удаление символа новой строки
+    new_release_date[strcspn(new_release_date, "\n")] = '\0';
 
-    // Запрос нового жанра
     printf("Enter the new genre: ");
     fgets(new_genre, sizeof(new_genre), stdin);
-    new_genre[strcspn(new_genre, "\n")] = '\0'; // Удаление символа новой строки
+    new_genre[strcspn(new_genre, "\n")] = '\0';
 
-    // Вызов хранимой процедуры update_book
+
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "call update_book ( $1  , $2  , $3  , $4  )", 
 	ECPGt_int,&(book_id),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
@@ -405,20 +400,20 @@ void update_book_by_id() {
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(new_genre),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 180 "main.ec"
+#line 175 "main.ec"
 
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to update book: %s\n", sqlca.sqlerrm.sqlerrmc);
         { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 184 "main.ec"
+#line 179 "main.ec"
 
         return;
     }
 
     { ECPGtrans(__LINE__, NULL, "commit");}
-#line 188 "main.ec"
- // Фиксируем изменения
+#line 183 "main.ec"
+
     printf("Book updated successfully!\n");
 }
 
@@ -427,22 +422,21 @@ void show_current_database_and_user() {
      
      
     
-#line 194 "main.ec"
+#line 189 "main.ec"
  char db_name [ 256 ] ;
  
-#line 195 "main.ec"
+#line 190 "main.ec"
  char user_name [ 256 ] ;
 /* exec sql end declare section */
-#line 196 "main.ec"
+#line 191 "main.ec"
 
 
-    // Получаем текущую базу данных и пользователя
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select current_database ( ) , current_user", ECPGt_EOIT, 
 	ECPGt_char,(db_name),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(user_name),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
-#line 199 "main.ec"
+#line 193 "main.ec"
 
 
     if (sqlca.sqlcode != 0) {
@@ -458,10 +452,8 @@ void show_current_database_and_user() {
 void create_and_switch_database(const char *db_name) {
     char command[512];
 
-    // Формируем команду для создания базы данных через psql
     snprintf(command, sizeof(command), "psql -U admin -d postgres -c 'CREATE DATABASE %s'", db_name);
 
-    // Выполняем команду через system()
     int result = system(command);
 
     if (result != 0) {
@@ -471,16 +463,13 @@ void create_and_switch_database(const char *db_name) {
 
     printf("Database '%s' created successfully!\n", db_name);
 
-    // Закрываем текущее подключение
     { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 228 "main.ec"
+#line 219 "main.ec"
 
     printf("Disconnected from the current database.\n");
 
-    // Подключаемся к новой базе данных
     connect_to_db("admin", "adminpass", db_name);
 
-    // Выполняем SQL-запросы из шаблона
     snprintf(command, sizeof(command), "psql -U admin -d %s -f template.sql", db_name);
     result = system(command);
 
@@ -498,40 +487,36 @@ void switch_database() {
      
      
     
-#line 248 "main.ec"
+#line 237 "main.ec"
  char db_name [ 256 ] ;
  
-#line 249 "main.ec"
+#line 238 "main.ec"
  char username [ 256 ] ;
  
-#line 250 "main.ec"
+#line 239 "main.ec"
  char password [ 256 ] ;
 /* exec sql end declare section */
-#line 251 "main.ec"
+#line 240 "main.ec"
 
 
-    // Запрос имени базы данных
+
     printf("Enter the name of the database: ");
     fgets(db_name, sizeof(db_name), stdin);
-    db_name[strcspn(db_name, "\n")] = '\0'; // Удаление символа новой строки
+    db_name[strcspn(db_name, "\n")] = '\0';
 
-    // Запрос логина
     printf("Enter the username: ");
     fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n")] = '\0'; // Удаление символа новой строки
+    username[strcspn(username, "\n")] = '\0';
 
-    // Запрос пароля
     printf("Enter the password: ");
     fgets(password, sizeof(password), stdin);
-    password[strcspn(password, "\n")] = '\0'; // Удаление символа новой строки
+    password[strcspn(password, "\n")] = '\0';
 
-    // Закрываем текущее подключение
     { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 269 "main.ec"
+#line 255 "main.ec"
 
     printf("Disconnected from the current database.\n");
 
-    // Подключаемся к новой базе данных
     connect_to_db(username, password, db_name);
 }
 
@@ -539,69 +524,63 @@ void delete_database() {
     /* exec sql begin declare section */
      
      
-      // Используем тип bool
+     
     
-#line 278 "main.ec"
+#line 263 "main.ec"
  char db_name [ 256 ] ;
  
-#line 279 "main.ec"
+#line 264 "main.ec"
  char current_user [ 256 ] ;
  
-#line 280 "main.ec"
+#line 265 "main.ec"
  bool is_admin ;
 /* exec sql end declare section */
-#line 281 "main.ec"
+#line 266 "main.ec"
 
 
-    // Получаем текущего пользователя
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select current_user", ECPGt_EOIT, 
 	ECPGt_char,(current_user),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
-#line 284 "main.ec"
+#line 268 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to get current user: %s\n", sqlca.sqlerrm.sqlerrmc);
         return;
     }
 
-    printf("Current user: %s\n", current_user); // Отладочное сообщение
+    printf("Current user: %s\n", current_user);
 
-    // Проверяем, является ли пользователь администратором
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select rolsuper from pg_roles where rolname = $1 ", 
 	ECPGt_char,(current_user),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, 
 	ECPGt_bool,&(is_admin),(long)1,(long)1,sizeof(bool), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
-#line 293 "main.ec"
+#line 276 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to check admin privileges: %s\n", sqlca.sqlerrm.sqlerrmc);
         return;
     }
 
-    printf("Is admin: %d\n", is_admin); // Отладочное сообщение
+    printf("Is admin: %d\n", is_admin);
 
-    if (!is_admin) { // Проверяем, что is_admin == false
+    if (!is_admin) {
         fprintf(stderr, "Permission denied: Only admin can delete databases.\n");
         return;
     }
 
-    // Запрос имени базы данных для удаления
     printf("Enter the name of the database to delete: ");
     fgets(db_name, sizeof(db_name), stdin);
-    db_name[strcspn(db_name, "\n")] = '\0'; // Удаление символа новой строки
+    db_name[strcspn(db_name, "\n")] = '\0'; 
 
-    // Проверка длины имени базы данных
     if (strlen(db_name) > 242) {
         fprintf(stderr, "Database name is too long. Maximum length is 242 characters.\n");
         return;
     }
 
-    // Формируем команду для удаления базы данных через psql
     char command[512];
     snprintf(command, sizeof(command), "psql -U admin -d postgres -c 'DROP DATABASE %s'", db_name);
 
-    // Выполняем команду через system()
     int result = system(command);
 
     if (result != 0) {
@@ -621,55 +600,51 @@ void create_user_with_permissions() {
      
      
     
-#line 334 "main.ec"
+#line 313 "main.ec"
  char username [ 256 ] ;
  
-#line 335 "main.ec"
+#line 314 "main.ec"
  char password [ 256 ] ;
  
-#line 336 "main.ec"
+#line 315 "main.ec"
  int can_view ;
  
-#line 337 "main.ec"
+#line 316 "main.ec"
  int can_insert ;
  
-#line 338 "main.ec"
+#line 317 "main.ec"
  int can_update ;
  
-#line 339 "main.ec"
+#line 318 "main.ec"
  int can_delete ;
 /* exec sql end declare section */
-#line 340 "main.ec"
+#line 319 "main.ec"
 
 
-    // Запрос имени пользователя
     printf("Enter username: ");
     fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n")] = '\0'; // Удаление символа новой строки
+    username[strcspn(username, "\n")] = '\0';
 
-    // Запрос пароля
     printf("Enter password: ");
     fgets(password, sizeof(password), stdin);
-    password[strcspn(password, "\n")] = '\0'; // Удаление символа новой строки
+    password[strcspn(password, "\n")] = '\0'; 
 
-    // Запрос прав доступа
     printf("Can view (1/0): ");
     scanf("%d", &can_view);
-    getchar(); // Очистка буфера после ввода числа
+    getchar(); 
 
     printf("Can insert (1/0): ");
     scanf("%d", &can_insert);
-    getchar(); // Очистка буфера после ввода числа
+    getchar(); 
 
     printf("Can update (1/0): ");
     scanf("%d", &can_update);
-    getchar(); // Очистка буфера после ввода числа
+    getchar(); 
 
     printf("Can delete (1/0): ");
     scanf("%d", &can_delete);
-    getchar(); // Очистка буфера после ввода числа
+    getchar();
 
-    // Вызов хранимой процедуры
     { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "call create_user_with_permissions ( $1  , $2  , $3  , $4  , $5  , $6  )", 
 	ECPGt_char,(username),(long)256,(long)1,(256)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
@@ -683,19 +658,19 @@ void create_user_with_permissions() {
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(can_delete),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 370 "main.ec"
+#line 345 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Failed to create user: %s\n", sqlca.sqlerrm.sqlerrmc);
         { ECPGtrans(__LINE__, NULL, "rollback");}
-#line 373 "main.ec"
+#line 348 "main.ec"
 
         return;
     }
 
     { ECPGtrans(__LINE__, NULL, "commit");}
-#line 377 "main.ec"
- // Фиксируем изменения
+#line 352 "main.ec"
+
     printf("User '%s' created successfully with selected permissions!\n", username);
 }
 
@@ -721,8 +696,8 @@ void print_menu() {
     printf("%s7.%s Create and switch to a new database\n", COLOR_GREEN, COLOR_RESET);
     printf("%s8.%s Show current database and user\n", COLOR_GREEN, COLOR_RESET);
     printf("%s9.%s Switch database\n", COLOR_GREEN, COLOR_RESET);
-    printf("%s10.%s Delete database (admin only)\n", COLOR_RED, COLOR_RESET);
-    printf("%s11.%s Create user with permissions\n", COLOR_GREEN, COLOR_RESET); // Новый пункт
+    printf("%s10.%s Delete database\n", COLOR_RED, COLOR_RESET);
+    printf("%s11.%s Create user with permissions\n", COLOR_GREEN, COLOR_RESET);
     printf("%s12.%s Exit\n", COLOR_RED, COLOR_RESET);
     printf("Enter your choice: ");
 }
@@ -733,24 +708,22 @@ int main() {
      
      
     
-#line 411 "main.ec"
+#line 386 "main.ec"
  char db_name [ 256 ] ;
  
-#line 412 "main.ec"
+#line 387 "main.ec"
  char username [ 256 ] ;
  
-#line 413 "main.ec"
+#line 388 "main.ec"
  char password [ 256 ] ;
 /* exec sql end declare section */
-#line 414 "main.ec"
+#line 389 "main.ec"
 
 
-    // Запрашиваем данные для подключения
     get_connection_details(db_name, username, password);
 
-    // Подключаемся к базе данных
     { ECPGconnect(__LINE__, 0, db_name , username , password , NULL, 0); }
-#line 420 "main.ec"
+#line 393 "main.ec"
 
     if (sqlca.sqlcode != 0) {
         fprintf(stderr, "Connection failed: %s\n", sqlca.sqlerrm.sqlerrmc);
@@ -758,30 +731,29 @@ int main() {
     }
     printf("Connected to database '%s' successfully!\n", db_name);
 
-    // Основной цикл программы
     int choice;
     char input[256];
-    char release_date[11]; // Формат даты: YYYY-MM-DD
+    char release_date[11];
     char genre[256];
 
     while (1) {
         print_menu();
         scanf("%d", &choice);
-        getchar(); // Очистка буфера после ввода числа
+        getchar();
 
         switch (choice) {
             case 1:
                 printf("Enter book title: ");
                 fgets(input, sizeof(input), stdin);
-                input[strcspn(input, "\n")] = '\0'; // Удаление символа новой строки
+                input[strcspn(input, "\n")] = '\0';
 
                 printf("Enter release date (YYYY-MM-DD): ");
                 fgets(release_date, sizeof(release_date), stdin);
-                release_date[strcspn(release_date, "\n")] = '\0'; // Удаление символа новой строки
+                release_date[strcspn(release_date, "\n")] = '\0';
 
                 printf("Enter genre: ");
                 fgets(genre, sizeof(genre), stdin);
-                genre[strcspn(genre, "\n")] = '\0'; // Удаление символа новой строки
+                genre[strcspn(genre, "\n")] = '\0';
 
                 add_book(input, release_date, genre);
                 break;
@@ -789,7 +761,7 @@ int main() {
             case 2:
                 printf("Enter genre to search: ");
                 fgets(input, sizeof(input), stdin);
-                input[strcspn(input, "\n")] = '\0'; // Удаление символа новой строки
+                input[strcspn(input, "\n")] = '\0';
 
                 search_books_by_genre(input);
                 break;
@@ -801,7 +773,7 @@ int main() {
             case 4:
                 printf("Enter book title to delete: ");
                 fgets(input, sizeof(input), stdin);
-                input[strcspn(input, "\n")] = '\0'; // Удаление символа новой строки
+                input[strcspn(input, "\n")] = '\0';
 
                 delete_book(input);
                 break;
@@ -817,7 +789,7 @@ int main() {
             case 7:
                 printf("Enter the name of the new database: ");
                 fgets(input, sizeof(input), stdin);
-                input[strcspn(input, "\n")] = '\0'; // Удаление символа новой строки
+                input[strcspn(input, "\n")] = '\0';
 
                 create_and_switch_database(input);
                 break;
@@ -834,13 +806,13 @@ int main() {
                 delete_database();
                 break;
 
-            case 11: // Новый пункт
+            case 11:
                 create_user_with_permissions();
                 break;
 
             case 12:
                 { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 508 "main.ec"
+#line 480 "main.ec"
 
                 printf("Disconnected from database.\n");
                 return 0;
